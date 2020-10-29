@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
-from .models import Topic
-from  .forms import TopicForm,EntryForm
+from .models import Topic, Entry
+from  .forms import TopicForm, EntryForm
 
 # Create your views here.
 
@@ -62,3 +62,22 @@ def new_entry(request, topic_id):
     # 显示空表单或指出表单数据无效
     context = {'form': form, 'topic': topic_data}
     return render(request, 'learning_logs/new_entry.html', context)
+
+
+def edit_entry(request, entry_id):
+    """编辑既有条目"""
+    entry_data = Entry.objects.get(id=entry_id)
+    topic_date = entry_data.topic
+
+    if request.method != 'POST':
+        # 初次请求：使用当前条目填充表单
+        form = EntryForm(instance=entry_data)
+    else:
+        # POST 提交的数据：对数据进行处理
+        form = EntryForm(instance=entry_data, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('learning_logs:topic', topic_id=topic_date.id)
+
+    context = {'form': form, 'entry': entry_data, 'topic': topic_date}
+    return render(request, 'learning_logs/edit_entry.html', context)
