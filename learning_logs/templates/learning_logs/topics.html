@@ -4,6 +4,8 @@
 
 <p>Topics</p>
 
+<a href="{%url 'learning_logs:new topic'%}">Add a new topic</a>
+
 <ul>
     {%for topic in topics%}
     <li>
@@ -13,7 +15,5 @@
     <li>No topics have been added yet.</li>
     {%endfor%}
 </ul>
-
-<a href="{%url 'learning_logs:new topic'%}">Add a new topic</a>
 
 {%endblock content%}
