@@ -57,8 +57,7 @@ def new_topic(request):
 def new_entry(request, topic_id):
     """在特定主题中添加新条目"""
     topic_data = Topic.objects.get(id=topic_id)
-    if request.user != topic_data.owner:
-        raise Http404
+    check_topic_owner(request, topic_data)
 
     if request.method != 'POST':
         # 未提交数据：创建一个空表单
@@ -81,9 +80,8 @@ def new_entry(request, topic_id):
 def edit_entry(request, entry_id):
     """编辑既有条目"""
     entry_data = Entry.objects.get(id=entry_id)
-    topic_date = entry_data.topic
-    if request.user != topic_date.owner:
-        raise Http404
+    topic_data = entry_data.topic
+    check_topic_owner(request, topic_data)
 
     if request.method != 'POST':
         # 初次请求：使用当前条目填充表单
@@ -97,3 +95,9 @@ def edit_entry(request, entry_id):
 
     context = {'form': form, 'entry': entry_data, 'topic': topic_date}
     return render(request, 'learning_logs/edit_entry.html', context)
+
+
+def check_topic_owner(request, topic_data):
+    # 检测请求用户和当前条目的相应用户是否是同一个
+    if request.user != topic_data.owner:
+        raise Http404
